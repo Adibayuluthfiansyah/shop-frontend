@@ -1,3 +1,4 @@
+//product
 export interface Product {
   id: number;
   name: string;
@@ -8,6 +9,18 @@ export interface Product {
   categoryId: number;
 }
 
+
+export interface ProductResponse {
+    data: Product[];
+    meta: {
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+    }
+}
+
+//auth
 export interface User {
   id: number;
   email: string;
@@ -17,6 +30,24 @@ export interface User {
 
 export interface AuthResponse {
   message: string;
-  accesToken: string;
+  accessToken: string;
   user: User;
+}
+
+//cart
+export interface AddToCartRequest {
+  productId: number;
+  quantity: number;
+}
+
+export interface CartItemResponse {
+  id: number;
+  productId: number;
+  quantity: number;
+  product: {
+    name: string;
+    price: number;
+    description?: string;
+    imageUrl?: string;
+  }
 }
