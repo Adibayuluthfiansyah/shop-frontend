@@ -1,17 +1,11 @@
-
 import { useQuery } from "@tanstack/react-query";
-import api from "@/lib/axios";
-import { ProductResponse } from "@/types";
+import { getProducts } from "../service/productService";
 
-const fetchProduct = async (): Promise<ProductResponse> => {
-    const data = await api.get<ProductResponse>("/products");
-    return data.data;
-}
 
-export const useProduct = () => {
+export const useProducts = () => {
     return useQuery({
         queryKey: ['products'],
-        queryFn: fetchProduct,
+        queryFn: getProducts,
         staleTime: 1 * 60 * 1000, 
     });
 };

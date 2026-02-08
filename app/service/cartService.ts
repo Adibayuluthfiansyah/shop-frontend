@@ -1,16 +1,31 @@
 import api from "@/lib/axios";
-import { AddToCartRequest, CartItemResponse } from "@/types";
+import { ActionResponse } from "@/types/api";
+import { AddToCartRequest, CartItem, UpdateCartItemRequest } from "@/types/cart";
 
-export const fetchCartItems = async (): Promise<CartItemResponse[]> => {
-    const {data} = await api.get("/cart");
-    return data;
-} 
-
-export const addToCart = async (payload: AddToCartRequest) => {
-    const {data} = await api.post("/cart", payload);
-    return data;
+interface CartActionData {
+    cartItem: CartItem;
 }
 
-export const removeFromCart = async (id: number) => {
-    const {data} = await api.delete(`/cart/${id}`);
+export const cartService = {
+    getCart: async () => {
+        const res = await api.get<CartItem[]>('/cart');
+        return res.data;
+    },
+    addToCart: async (payload: AddToCartRequest) => {
+        const res = await api.post<ActionResponse<CartActionData>>('/cart', payload);
+        return res.data;
+    },
+    updateCart: async(id:number, quantity:number) => {
+        const payload: UpdateCartItemRequest = {quantity};
+        const res = await api.put<ActionResponse<CartActionData>>(`/cart/${id}`, payload)
+        return res.data;
+    },
+    removeFromCart: async (id:number) => {
+        const res = await api.delete<ActionResponse>(`/cart/${id}`);
+        return res.data;
+    },
+    clearCart: async () => {
+        const res = await api.delete<ActionResponse>('/cart');
+        return res.data;
+    }
 }

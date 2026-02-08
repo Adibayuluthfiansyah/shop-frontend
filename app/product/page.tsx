@@ -1,7 +1,7 @@
 "use client";
 import { useCartStore } from "../store/useCartStore";
 import { useProduct } from "../hooks/useProduct";
-import { Product } from "@/types";
+import { Product } from "@/types/api";
 import {
   Card,
   CardContent,
