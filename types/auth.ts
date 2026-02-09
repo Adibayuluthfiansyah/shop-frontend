@@ -3,7 +3,8 @@ export interface User {
   email: string;
   name: string;
   phone?:string;
-  role: 'ADMIN' | 'USER';
+  role: 'ADMIN' | 'USER' | 'SELLER';
+  avatarUrl?: string;
 }
 
 export interface LoginRequest {
@@ -13,7 +14,6 @@ export interface LoginRequest {
 
 export interface AuthResponse {
   message: string;
-  accessToken: string;
   user: User;
 }
 

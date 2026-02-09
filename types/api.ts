@@ -3,6 +3,12 @@ export interface ApiResponse<T> {
   message: string;
 }
 
+export interface ApiErrorResponse {
+  message: string | string[];
+  error: string;
+  statusCode: number;
+}
+
 export interface ActionResponse<T = undefined> {
   message: string;
   data?: T;

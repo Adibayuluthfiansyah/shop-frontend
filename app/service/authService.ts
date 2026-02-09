@@ -2,17 +2,25 @@ import { LoginRequest, RegisterRequest, AuthResponse, User } from "@/types/auth"
 import api from "@/lib/axios";
 
 export const authService = {
-    login: async (payload: LoginRequest) => {
+    login: async (payload: LoginRequest): Promise <AuthResponse> => {
         const res = await api.post<AuthResponse>('/auth/login', payload);
-        localStorage.setItem('accessToken', res.data.accessToken)
         return res.data;
     },
-    register: async (payload: RegisterRequest) => {
+    register: async (payload: RegisterRequest): Promise<User> => {
         const res = await api.post<User>('/auth/register', payload);
         return res.data;
     },
-    getProfile: async () => {
+    getProfile: async (): Promise<User> => {
         const res = await api.get<User>('/auth/profile');
         return res.data;
+    },
+    logout: async () => {
+       try {
+        await api.post('/auth/logout');
+       } catch (error){
+        console.error('Logout failed', error);
+       } finally{
+        window.location.href = '/login';
+       }
     }
 }
