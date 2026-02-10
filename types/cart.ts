@@ -1,12 +1,10 @@
+import { Product } from "./product";
 export interface CartItem {
   id: number;
+  cartId: number;
   productId: number;
   quantity: number;
-  product: {
-    name: string;
-    price: string; 
-    imageUrl?: string;
-  };
+  product: Product;
 }
 
 export interface AddToCartRequest {
@@ -16,4 +14,12 @@ export interface AddToCartRequest {
 
 export interface UpdateCartItemRequest {
     quantity: number;
+}
+
+export interface CartResponse {
+    id: number;
+    userId: number;
+    items: CartItem[];
+    createdAt: string;
+    updatedAt: string;
 }

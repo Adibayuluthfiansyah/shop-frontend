@@ -12,7 +12,7 @@ export default function CsrfInitializer() {
     if (!initialized.current) {
       const fetchCsrfToken = async () => {
         try {
-          const res = await api.get("/auth/csrf-token");
+          const res = await api.get("/api/auth/csrf-token");
           setCsrfToken(res.data.csrfToken);
           initialized.current = true;
         } catch (error) {

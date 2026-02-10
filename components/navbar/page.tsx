@@ -17,10 +17,7 @@ import { useState } from "react";
 export default function Navbar() {
   const [hoveredLink, setHoveredLink] = useState<string | null>(null);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const totalItems = useCartStore((state) =>
-    state.items.reduce((acc, item) => acc + item.quantity, 0),
-  );
-
+  const totalItems = useCartStore((state) => state.totalItems);
   const { scrollY } = useScroll();
   const backgroundColor = useTransform(
     scrollY,
@@ -233,7 +230,7 @@ export default function Navbar() {
                 variants={navItemVariants}
                 className="hidden sm:block"
               >
-                <Link href="/auth">
+                <Link href="/login">
                   <motion.div
                     whileHover={{
                       scale: 1.05,
