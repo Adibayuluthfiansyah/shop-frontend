@@ -1,7 +1,7 @@
 "use client";
-import { useCartStore } from "../store/useCartStore";
-import { useProduct } from "../hooks/useProduct";
-import { Product } from "@/types/api";
+import { useProducts } from "../hooks/useProduct";
+import { useAddToCart } from "../hooks/useCart";
+import { Product } from "@/types/product";
 import {
   Card,
   CardContent,
@@ -15,8 +15,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import Image from "next/image";
 
 export default function ProductPage() {
-  const { data: response, isLoading, isError } = useProduct();
-  const addToCart = useCartStore((state) => state.addToCart);
+  const { data: response, isLoading, isError } = useProducts();
+  const { mutate: addToCart } = useAddToCart();
   const products = response?.data || [];
 
   if (isLoading) {
@@ -96,12 +96,8 @@ export default function ProductPage() {
                 onClick={() => {
                   addToCart({
                     productId: product.id,
-                    name: product.name,
-                    price: Number(product.price),
                     quantity: 1,
-                    imageUrl: product.imageUrl,
                   });
-                  alert("Masuk keranjang!");
                 }}
               >
                 {product.stock > 0 ? "+ Keranjang" : "Habis"}
