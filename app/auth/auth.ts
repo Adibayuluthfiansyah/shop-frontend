@@ -1,8 +1,6 @@
 import NextAuth from "next-auth"
 import Google from "next-auth/providers/google"
-import { PrismaAdapter } from "@auth/prisma-adapter"
-import { PrismaClient } from "@prisma/client"
-import type { Adapter } from "next-auth/adapters"
+import Credentials from "next-auth/providers/credentials"
 import { JWT } from "next-auth/jwt"
 
 // Backend API URL
@@ -50,147 +48,124 @@ export const {handlers, auth, signIn, signOut } = NextAuth({
           response_type: "code",
         }
       }
+    }),
+
+   Credentials({
+      name: "Credentials",
+      credentials: {
+        email: { label: "Email", type: "email" },
+        password: { label: "Password", type: "password" }
+      },
+      async authorize(credentials) {
+        try {
+          const res = await fetch(`${BACKEND_API_URL}/auth/login`, {
+            method: 'POST',
+            body: JSON.stringify(credentials),
+            headers: { "Content-Type": "application/json" }
+          });
+          
+          const data = await res.json();
+
+          if (res.ok && data) {
+            return {
+              id: data.user.id,
+              name: data.user.name,
+              email: data.user.email,
+              role: data.user.role,
+              image: data.user.image, 
+              accessToken: data.access_token,
+              refreshToken: data.refresh_token,
+            };
+          }
+          return null;
+        } catch (error) {
+          console.error("Login Credentials Error:", error);
+          return null;
+        }
+      }
     })
   ],
   session: {strategy: "jwt"},
+  secret: process.env.NEXTAUTH_SECRET,
 
   callbacks: {
-    async jwt ({
-      token,user,account
-    }){
+    async jwt({ token, user, account }) {
       if (account && user) {
-        try {
-          const response = await fetch(`${BACKEND_API_URL}/auth/google-login`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              email: user.email,
-              name: user.name,
-              googleId: account.providerAccountId, 
-              image: user.image,
-              emailVerified: true,
-            }),
-          })
-          const backendData = await response.json();
+        // if login google
+        if (account.provider === "google") {
+          try {
+            // send to backend
+            const response = await fetch(`${BACKEND_API_URL}/auth/google-login`, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                email: user.email,
+                name: user.name,
+                googleId: account.providerAccountId,
+                image: user.image,
+                emailVerified: true,
+              }),
+            });
+            
+            const backendData = await response.json();
+            
+            if (!response.ok) throw new Error('Backend authentication failed');
 
-          if (!response.ok) throw new Error('Backend authentication failed');
-          return {
-            ...token,
-            backendAccessToken: backendData.access_token, 
-            backendRefreshToken: backendData.refresh_token,
-            role: backendData.user.role,
-            id: backendData.user.id,
-            expiresAt: Date.now() + 15 * 60 * 1000, 
-          };
-        } catch (error){
-          console.error("Error calling backend Google login:", error);
+            // save data to token
+            token.backendAccessToken = backendData.access_token;
+            token.backendRefreshToken = backendData.refresh_token;
+            token.role = backendData.user.role;
+            token.id = backendData.user.id;
+            token.picture = backendData.user.image;
+            token.expiresAt = Date.now() + 15 * 60 * 1000; 
+
+            return token;
+          } catch (error) {
+            console.error("Error calling backend Google login:", error);
+            return token;
+          }
+        }
+        
+        // if login creadentials
+        if (account.provider === "credentials") {
+          token.id = user.id;
+          token.role = user.role;
+          token.picture = user.image;
+          token.backendAccessToken = user.accessToken;
+          token.backendRefreshToken = user.refreshToken;
+          token.expiresAt = Date.now() + 15 * 60 * 1000;
+          
           return token;
         }
       }
+
+      // if token not expired
       if (Date.now() < (token.expiresAt as number)) {
         return token;
       }
 
+      // if expired
       console.log("Token expired, refreshing...");
       return await refreshAccessToken(token);
     },
-    
+
     async session({ session, token }) {
       return {
         ...session,
         user: {
           ...session.user,
-          id: token.id as number,
+          id: token.id as string | number,
           role: token.role as string,
+          image: token.picture as string | null, 
         },
         accessToken: token.backendAccessToken as string,
         error: token.error, 
       };
     },
   },
-  
+
   pages: {
     signIn: '/login',
-    }
-})
-
-// const globalForPrisma = globalThis as unknown as { prisma: PrismaClient };
-// const prisma = globalForPrisma.prisma || new PrismaClient();
-// if (process.env.NODE_ENV !== "production") globalForPrisma.prisma = prisma;
-
-
-// export const { handlers, auth, signIn, signOut } = NextAuth({
-//   adapter: PrismaAdapter(prisma) as Adapter,
-  
-//   providers: [
-//     Google({
-//       clientId: process.env.AUTH_GOOGLE_ID,
-//       clientSecret: process.env.AUTH_GOOGLE_SECRET,
-//       // Use default profile mapping - PrismaAdapter will handle ID properly
-//     }),
-//   ],
-  
-//   session: { strategy: "jwt" },
-  
-//   callbacks: {
-//     async jwt({ token, user, account, profile }) {
-//       // First time sign in 
-//       if (user && account?.provider === "google") {
-//         try {
-//           // Call backend API to create/update user and get JWT
-//           const response = await fetch(`${BACKEND_API_URL}/auth/google-login`, {
-//             method: 'POST',
-//             headers: {
-//               'Content-Type': 'application/json',
-//             },
-//             body: JSON.stringify({
-//               email: user.email,
-//               name: user.name,
-//               googleId: account.providerAccountId, 
-//               image: user.image,
-//               emailVerified: user.emailVerified,
-//             }),
-//           });
-
-//           if (!response.ok) {
-//             console.error('Backend Google login failed:', await response.text());
-//             throw new Error('Failed to authenticate with backend');
-//           }
-
-//           const backendData = await response.json();
-          
-//           // Store backend JWT token and user info in NextAuth token
-//           token.backendAccessToken = backendData.accessToken;
-//           token.id = backendData.user.id;
-//           token.role = backendData.user.role;
-//           token.email = backendData.user.email;
-//           token.name = backendData.user.name;
-//           token.picture = backendData.user.image;
-          
-//           console.log('Backend JWT obtained successfully');
-//         } catch (error) {
-//           console.error(' Error calling backend Google login:', error);
-//         }
-//       }
-      
-//       return token;
-//     },
-    
-//     async session({ session, token }) {
-//       return {
-//         ...session,
-//         user: {
-//           ...session.user,
-//           id: token.id as number,
-//           role: token.role as string,
-//         },
-//         backendAccessToken: token.backendAccessToken,
-//       };
-//     },
-//   },
-  
-//   pages: {
-//     signIn: '/login',
-//     error: '/login',
-//   },
-// })
+    error: '/login', 
+  },
+});

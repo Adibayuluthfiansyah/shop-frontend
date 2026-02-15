@@ -1,111 +1,47 @@
 "use client";
-import { useProducts } from "../hooks/useProduct";
-import { useAddToCart } from "../hooks/useCart";
-import { Product } from "@/types/product";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
-import Image from "next/image";
 
-export default function ProductPage() {
-  const { data: response, isLoading, isError } = useProducts();
-  const { mutate: addToCart } = useAddToCart();
-  const products = response?.data || [];
+import ProductList from "@/components/product/ProductList";
+import Link from "next/link";
+import Navbar from "@/components/navbar/Navbar";
+import { ArrowRight } from "lucide-react";
 
-  if (isLoading) {
-    return (
-      <div className="container mx-auto py-8 px-4">
-        <h1 className="text-3xl font-bold mb-6">Katalog Produk</h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {[...Array(8)].map((_, i) => (
-            <div key={i} className="space-y-3">
-              <Skeleton className="h-48 w-full rounded-xl" />
-              <div className="space-y-2">
-                <Skeleton className="h-4 w-250px" />
-                <Skeleton className="h-4 w-200px" />
-              </div>
-            </div>
-          ))}
+export default function ProductDisplayPage() {
+  return (
+    <section className="bg-gray-50 py-16 md:py-24">
+      <Navbar />
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Header Section */}
+        <div className="flex items-end justify-between mb-8 md:mb-12">
+          <div>
+            <h2 className="text-3xl font-bold text-gray-900 tracking-tight">
+              Recommended For You
+            </h2>
+            <p className="text-gray-500 mt-2 text-sm md:text-base max-w-2xl">
+              Handpicked essentials just for you. Quality meets minimalism.
+            </p>
+          </div>
+
+          <Link
+            href="/shop"
+            className="hidden md:flex items-center gap-2 text-sm font-semibold text-black hover:text-blue-600 transition-colors group"
+          >
+            See all products
+            <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-1" />
+          </Link>
+        </div>
+
+        {/* product component */}
+        <ProductList />
+
+        {/* mobile */}
+        <div className="mt-8 md:hidden">
+          <Link href="/shop">
+            <button className="w-full bg-white border border-gray-300 text-gray-900 font-medium py-3 rounded-lg hover:bg-gray-50 transition-colors">
+              View All Products
+            </button>
+          </Link>
         </div>
       </div>
-    );
-  }
-
-  if (isError) {
-    return (
-      <div className="text-center py-10 text-red-500">
-        Failed to load products.
-      </div>
-    );
-  }
-
-  return (
-    <div className="container mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold mb-6">Products</h1>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-        {products.map((product: Product) => (
-          <Card
-            key={product.id}
-            className="flex flex-col justify-between hover:shadow-lg transition-shadow duration-300"
-          >
-            <div className="relative h-48 w-full bg-gray-100 flex items-center justify-center overflow-hidden rounded-t-lg">
-              {product.imageUrl ? (
-                <Image
-                  src={product.imageUrl}
-                  alt={product.name}
-                  className="object-cover w-full h-full"
-                  fill
-                />
-              ) : (
-                <span className="text-gray-400">No Image</span>
-              )}
-              {product.stock <= 0 && (
-                <Badge className="absolute top-2 right-2 bg-red-500">
-                  Out of Stock
-                </Badge>
-              )}
-            </div>
-
-            <CardHeader>
-              <CardTitle className="text-lg line-clamp-1" title={product.name}>
-                {product.name}
-              </CardTitle>
-            </CardHeader>
-
-            <CardContent>
-              <p className="text-xl font-bold text-primary">
-                Rp {Number(product.price).toLocaleString("id-ID")}
-              </p>
-              <p className="text-sm text-gray-500 mt-1">
-                Stok: {product.stock}
-              </p>
-            </CardContent>
-
-            <CardFooter>
-              <Button
-                className="w-full"
-                disabled={product.stock <= 0}
-                onClick={() => {
-                  addToCart({
-                    productId: product.id,
-                    quantity: 1,
-                  });
-                }}
-              >
-                {product.stock > 0 ? "+ Keranjang" : "Habis"}
-              </Button>
-            </CardFooter>
-          </Card>
-        ))}
-      </div>
-    </div>
+    </section>
   );
 }

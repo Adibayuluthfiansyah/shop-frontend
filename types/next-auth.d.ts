@@ -10,12 +10,12 @@ interface CustomUser extends NextAuthUser {
 declare module "next-auth" {
   interface Session {
     user: {
-      id: number;
+      id: number | string;
       role: string;
       name?: string | null;
       email?: string | null;
       image?: string | null;
-    };
+    } &  DefaultSession["user"];
     accessToken?: string; 
     error?: string;
   }
@@ -25,13 +25,15 @@ declare module "next-auth" {
     id: number | string;
     role: string;
     emailVerified?: Date | null;
+    accessToken?: string;  
+    refreshToken?: string;
   }
 }
 
 declare module "next-auth/jwt" {
 
   interface JWT {
-    id: number;
+    id: number | string;
     role: string;
     backendAccessToken?: string; 
     backendRefreshToken?: string; 

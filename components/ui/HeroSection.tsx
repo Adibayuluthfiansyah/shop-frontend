@@ -182,7 +182,7 @@ export default function HeroSection() {
                   </Button>
                 </motion.div>
               </Link>
-              <Link href="/products" className="w-full sm:w-auto">
+              <Link href="/product" className="w-full sm:w-auto">
                 <motion.div
                   whileHover={{ scale: 1.05, y: -2 }}
                   whileTap={{ scale: 0.95 }}

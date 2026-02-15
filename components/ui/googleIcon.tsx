@@ -1,7 +1,20 @@
 import React from "react";
 
+interface GoogleIconProps {
+  size?: number | string;
+  color?: string;
+  strokeWidth?: number;
+  background?: string;
+  opacity?: number;
+  rotation?: number;
+  shadow?: number;
+  flipHorizontal?: boolean;
+  flipVertical?: boolean;
+  padding?: number;
+}
+
 const GoogleFillIcon = ({
-  size = undefined,
+  size,
   color = "#000000",
   strokeWidth = 2,
   background = "transparent",
@@ -11,7 +24,7 @@ const GoogleFillIcon = ({
   flipHorizontal = false,
   flipVertical = false,
   padding = 0,
-}) => {
+}: GoogleIconProps) => {
   const transforms = [];
   if (rotation !== 0) transforms.push(`rotate(${rotation}deg)`);
   if (flipHorizontal) transforms.push("scaleX(-1)");

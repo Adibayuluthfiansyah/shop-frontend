@@ -1,8 +1,10 @@
 import axios from 'axios';
-import { useCsrfStore } from '@/app/store/useCsrfStore';
+import { getSession, signOut } from 'next-auth/react';
+
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000/api';
 
 const api = axios.create({
-  baseURL: process.env.NEXT_PUBLIC_API_URL,
+  baseURL: BASE_URL,
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',
@@ -10,30 +12,27 @@ const api = axios.create({
 });
 
 // add a request interceptor to include token 
-api.interceptors.request.use((config) => {
-  config.headers = config.headers || {};
-  if (typeof window !== 'undefined') {
-    // csrf token will be handled zustand without hooks 
-    const csrfToken = useCsrfStore.getState().csrfToken;
-    const method = config.method?.toUpperCase() || 'GET';
-
-    if (csrfToken && method && ['POST', 'PUT', 'PATCH', 'DELETE'].includes(method)) {
-      config.headers['X-CSRF-Token'] = csrfToken;
+api.interceptors.request.use(
+  async (config) => {
+    const session = await getSession();
+    if (session?.accessToken){
+      config.headers['Authorization'] = `Bearer ${session.accessToken}`;
     }
-  }
-  return config;
-}, (error) => {
-  return Promise.reject(error);
-}
+    return config;
+  },
+  (error) => Promise.reject(error)
 );
 
-// add a response interceptor to handle errors globally
-api.interceptors.response.use((response) => response, (error) => {
-  if (error.response?.status === 401) {
-    if (!window.location.pathname.includes('/login'))
-    window.location.href = '/login';
+// response interceptor to handle errors
+api.interceptors.response.use(
+  (response) => response ,
+  async (error) => {
+    if (error.response?.status === 401) {
+      console.error("Error 401:", error);
+      await signOut({callbackUrl: "/login"});
+    }
+    return Promise.reject(error);
   }
-  return Promise.reject(error);
-})
+);
 
 export default api;
