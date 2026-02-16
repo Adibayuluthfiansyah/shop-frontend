@@ -12,11 +12,11 @@ export const cartService = {
         return res.data;
     },
     updateCart: async(itemId:number, quantity:number) => {
-        const res = await api.patch<CartResponse>(`/cart/item/${itemId}`, {quantity} as UpdateCartItemRequest);
+        const res = await api.patch<CartResponse>(`/cart/${itemId}`, {quantity} as UpdateCartItemRequest);
         return res.data;
     },
     removeFromCart: async (itemId:number) => {
-        const res = await api.delete<CartResponse>(`/cart/item/${itemId}`);
+        const res = await api.delete<CartResponse>(`/cart/${itemId}`);
         return res.data;
     },
     clearCart: async () => {

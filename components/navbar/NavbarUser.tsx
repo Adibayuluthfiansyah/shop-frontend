@@ -43,7 +43,7 @@ export default function NavbarUser() {
         className="hidden sm:block"
       >
         <Link href={"/login"}>
-          <Button className="bg-black hover:bg-gray-900 text-white rounded-full px-5 h-9 text-[11px] font-medium tracking-wider uppercase transition-colors shadow-sm">
+          <Button className="bg-black hover:bg-gray-800 text-white rounded-full px-5 h-9 text-[11px] font-medium tracking-wider uppercase transition-colors shadow-sm cursor-pointer">
             SIGN IN
           </Button>
         </Link>

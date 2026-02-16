@@ -10,7 +10,7 @@ import { Product } from "@/types/product";
 import { useState, useEffect } from "react";
 import { ShoppingCart } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 export default function ProductCard({ product }: { product: Product }) {
   const { data: session, status } = useSession();

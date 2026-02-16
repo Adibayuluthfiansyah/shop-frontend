@@ -26,7 +26,7 @@ export default function Navbar() {
   );
   const borderOpacity = useTransform(scrollY, [0, 100], [0, 0.2]);
 
-  const leftMenuItems = ["shop", "men", "women", "about", "contact"];
+  const leftMenuItems = ["product", "shop", "about", "contact"];
 
   return (
     <>

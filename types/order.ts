@@ -10,6 +10,7 @@ export enum OrderStatus {
   DELIVERED = 'DELIVERED',
   CANCELED = 'CANCELED',
 }
+
 export interface Order {
   id: number;
   userId: number;
@@ -19,16 +20,28 @@ export interface Order {
   updatedAt: string;
   items: OrderItem[];
   user?: User;
+  snapToken?: string;
+  snapTokenRedirectUrl?: string;
+  midtransOrderId?: string;
+  paymentType?: string;
 }
 
 export interface OrderItem {
   id: number;
+  orderId: number;
   productId: number;
   quantity: number;
   price: string;
   product?: {
-  name: string;
-  imageUrl?: string;
+    id: number;
+    name: string;
+    description?: string;
+    price: string;
+    imageUrl?: string;
+    category?: {
+      id: number;
+      name: string;
+    };
   };
 }
 
@@ -40,7 +53,7 @@ export interface OrderQueryParams {
 
 export type OrderListResponse = PaginatedResponse<Order>;
 
-// admin update status
+
 export interface UpdateOrderStatusRequest {
   status: OrderStatus;
 }
