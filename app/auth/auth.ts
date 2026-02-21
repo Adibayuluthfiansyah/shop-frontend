@@ -60,11 +60,19 @@ export const {handlers, auth, signIn, signOut } = NextAuth({
         try {
           const res = await fetch(`${BACKEND_API_URL}/auth/login`, {
             method: 'POST',
-            body: JSON.stringify(credentials),
+            body: JSON.stringify({
+                email: credentials.email,
+                password: credentials.password,
+            }), 
             headers: { "Content-Type": "application/json" }
           });
           
           const data = await res.json();
+
+          if (!res.ok) {
+        console.log("Backend Login Error:", data); 
+        return null;
+      }
 
           if (res.ok && data) {
             return {

@@ -102,7 +102,7 @@ export default function NavbarUser() {
         <DropdownMenuGroup>
           {/*admin*/}
           {user.role === "ADMIN" && (
-            <Link href={"/admin/dahsboard"}>
+            <Link href={"/admin/dashboard"}>
               <DropdownMenuItem className="cursor-pointer">
                 <LayoutDashboard className="mr-2 h-4 w-4" />
                 <span>Admin Dashboard</span>

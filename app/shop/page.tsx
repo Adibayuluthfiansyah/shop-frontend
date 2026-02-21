@@ -25,15 +25,23 @@ export default function ShopPage() {
   const [priceRange, setPriceRange] = useState<[number, number]>([0, 20000000]);
   const [sortBy, setSortBy] = useState<SortOption>("createdAt");
   const [order, setOrder] = useState<SortOrder>("desc");
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 12;
+
   const { data, isLoading } = useProducts({
     categoryId: selectedCategory || undefined,
     sortBy: sortBy,
     order: order,
+    page: currentPage,
+    limit: pageSize,
   });
-  const products: Product[] = Array.isArray(data) ? data : data?.data || [];
+
+  const products: Product[] = data?.data || [];
+  const totalPages = data?.meta?.totalPages || 1;
+  const totalCount = data?.meta?.total || 0;
 
   return (
-    <div className="bg-white min-h-screen flex flex-col">
+    <div className="bg-white min-h-screen flex flex-col pt-2">
       <Navbar />
 
       {/* header */}
@@ -43,7 +51,7 @@ export default function ShopPage() {
             Shop All Products
           </h1>
           <p className="text-sm text-gray-500 mt-1">
-            Showing {products.length} results
+            Showing {products.length} of {totalCount} results
           </p>
         </div>
       </div>
@@ -168,18 +176,59 @@ export default function ShopPage() {
             )}
 
             {/* pagination */}
-            {products.length > 0 && (
+            {products.length > 0 && totalPages > 1 && (
               <div className="mt-12 flex justify-center">
-                <div className="flex gap-2">
-                  <Button variant="outline" disabled>
+                <div className="flex gap-2 items-center">
+                  <Button
+                    variant="outline"
+                    disabled={currentPage === 1}
+                    onClick={() => setCurrentPage((p) => Math.max(1, p - 1))}
+                  >
                     Previous
                   </Button>
-                  <Button variant="outline" className="bg-black text-white">
-                    1
+
+                  {/* Page numbers */}
+                  {Array.from({ length: totalPages }, (_, i) => i + 1)
+                    .filter((page) => {
+                      // Show first page, last page, current page, and pages around current
+                      return (
+                        page === 1 ||
+                        page === totalPages ||
+                        (page >= currentPage - 1 && page <= currentPage + 1)
+                      );
+                    })
+                    .map((page, index, array) => {
+                      // Add ellipsis
+                      const prevPage = array[index - 1];
+                      const showEllipsis = prevPage && page - prevPage > 1;
+
+                      return (
+                        <div key={page} className="flex gap-2 items-center">
+                          {showEllipsis && (
+                            <span className="px-2 text-gray-400">...</span>
+                          )}
+                          <Button
+                            variant="outline"
+                            className={
+                              currentPage === page
+                                ? "bg-black text-white hover:bg-gray-800 hover:text-white"
+                                : ""
+                            }
+                            onClick={() => setCurrentPage(page)}
+                          >
+                            {page}
+                          </Button>
+                        </div>
+                      );
+                    })}
+
+                  <Button
+                    variant="outline"
+                    disabled={currentPage === totalPages}
+                    onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))}
+                  >
+                    Next
                   </Button>
-                  <Button variant="outline">2</Button>
-                  <Button variant="outline">3</Button>
-                  <Button variant="outline">Next</Button>
                 </div>
               </div>
             )}

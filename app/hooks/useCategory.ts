@@ -7,7 +7,7 @@ export const useCategory = (slug?: string) => {
     queryKey: ["categories", slug || "all"],
     
     queryFn: async () => {
-      const endpoint = slug ? `/category/${slug}` : "/category"; 
+      const endpoint = slug ? `/categories/${slug}` : "/categories"; 
       const { data } = await api.get(endpoint);
       return data; 
     },

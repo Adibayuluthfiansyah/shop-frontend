@@ -44,6 +44,7 @@ export default function RegisterPage() {
         name: formData.name,
         email: formData.email,
         password: formData.password,
+        phone: formData.phoneNumber,
       });
 
       if (response.status === 201 || response.status === 200) {

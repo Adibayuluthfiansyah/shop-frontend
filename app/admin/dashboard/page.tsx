@@ -1,10 +1,11 @@
 "use client";
 
 import { useAdminUsers, useAdminMutations } from "@/app/hooks/useAdminAction";
+import Navbar from "@/components/navbar/Navbar";
 import { User } from "@/types/auth";
 import { useState } from "react";
 
-export default function AdminUsersPage() {
+export default function AdminDashboardPage() {
   const [page, setPage] = useState(1);
   const { data, isLoading, isError } = useAdminUsers(page);
   const { updateRole } = useAdminMutations();
@@ -24,7 +25,8 @@ export default function AdminUsersPage() {
     );
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
+    <div className="p-8 max-w-7xl mx-auto pt-25">
+      <Navbar />
       <div className="flex justify-between items-end mb-8">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-zinc-900">
