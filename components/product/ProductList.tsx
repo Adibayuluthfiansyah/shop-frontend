@@ -4,10 +4,14 @@ import { useProducts } from "@/app/hooks/useProduct";
 import ProductCard from "./ProductCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AlertCircle } from "lucide-react";
-import { Product } from "@/types/product";
+import { Product, ProductQueryParams } from "@/types/product";
 
-export default function ProductList() {
-  const { data, isLoading, isError } = useProducts();
+interface ProductListProps {
+  params?: ProductQueryParams;
+}
+
+export default function ProductList({ params }: ProductListProps = {}) {
+  const { data, isLoading, isError } = useProducts(params);
 
   if (isLoading) {
     return (

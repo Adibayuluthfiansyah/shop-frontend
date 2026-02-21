@@ -5,8 +5,9 @@ import Link from "next/link";
 import Image from "next/image";
 import { Product } from "@/types/product";
 import { useState } from "react";
+import Navbar from "@/components/navbar/Navbar";
 
-export default function SellerProductsPage() {
+export default function SellerDashboardPage() {
   const { data, isLoading, isError } = useSellerProducts();
   const { deleteProduct } = useProductMutations();
   const [deletingId, setDeletingId] = useState<number | null>(null);
@@ -31,7 +32,8 @@ export default function SellerProductsPage() {
   const products = data?.data || [];
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
+    <div className="p-8 max-w-7xl mx-auto pt-25">
+      <Navbar />
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold tracking-tight text-zinc-900">
@@ -42,7 +44,7 @@ export default function SellerProductsPage() {
           </p>
         </div>
         <Link
-          href="/seller/product/new"
+          href="/seller/products/new"
           className="inline-flex justify-center items-center rounded-full bg-zinc-900 px-4 py-2.5 text-sm font-semibold text-white hover:bg-zinc-700 transition-all shadow-sm"
         >
           + Add Product
@@ -53,7 +55,7 @@ export default function SellerProductsPage() {
         <div className="text-center py-12 border-2 border-dashed border-zinc-200 rounded-lg">
           <p className="text-zinc-500 mb-4">No products yet</p>
           <Link
-            href="/seller/product/new"
+            href="/seller/products/new"
             className="text-sm text-zinc-900 underline hover:text-zinc-700"
           >
             Create your first product
@@ -98,7 +100,7 @@ export default function SellerProductsPage() {
 
               <div className="mt-3 flex gap-2">
                 <Link
-                  href={`/seller/product/${product.id}/edit`}
+                  href={`/seller/products/${product.id}/edit`}
                   className="flex-1 text-center rounded-md bg-zinc-100 px-3 py-2 text-xs font-semibold text-zinc-900 hover:bg-zinc-200 transition-colors"
                 >
                   Edit

@@ -48,7 +48,7 @@ export default function MyOrdersPage() {
         <div className="text-center py-20 border border-dashed border-zinc-300 rounded-2xl">
           <p className="text-zinc-500">{`You haven't placed any orders yet.`}</p>
           <Link
-            href="/"
+            href="/shop"
             className="mt-4 inline-block text-sm font-semibold text-black underline"
           >
             Start Shopping
